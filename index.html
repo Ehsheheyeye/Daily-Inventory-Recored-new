@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Inventory Record</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Main Screen: Daily Inventory Record -->
+  <div id="main-screen">
+    <div class="header">
+      <span id="time">09:26 PM</span>
+      <span id="date">12 Oct 2024</span>
+    </div>
+    <h1>Daily Inventory Record</h1>
+    <div class="entry-no-container">
+      <span class="entry-no">Entry No - <span id="entry-number">1</span></span>
+    </div>
+
+    <!-- Inventory Form -->
+    <form id="inventory-form">
+      <div class="input-group">
+        <label>Client / Location</label>
+        <input type="text" id="client-location" oninput="autoSuggest()" required>
+        <ul id="suggestions" class="suggestions"></ul>
+      </div>
+
+      <div class="input-group">
+        <label>Work Description</label>
+        <textarea id="work-description" rows="3" required></textarea>
+      </div>
+
+      <button type="submit" id="save-record">Save</button>
+    </form>
+
+    <button id="previous-records" onclick="showPreviousRecords()">Records</button>
+  </div>
+
+  <!-- Previous Records Screen -->
+  <div id="previous-records-screen" style="display: none;">
+    <h1>Previous Records</h1>
+    <div id="records-list"></div>
+    <div class="footer">
+      <button onclick="showMainScreen()" class="left-button">Back</button>
+      <button onclick="exportToExcel()" class="right-button">Export</button>
+    </div>
+  </div>
+
+  <!-- JavaScript to handle form submission and Google Sheets integration -->
+  <script>
+    document.getElementById("inventory-form").addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const entryNo = document.getElementById("entry-number").innerText;
+      const date = document.getElementById("date").innerText;
+      const time = document.getElementById("time").innerText;
+      const clientLocation = document.getElementById("client-location").value;
+      const workDescription = document.getElementById("work-description").value;
+
+      const data = {
+        entryNo,
+        date,
+        time,
+        client: clientLocation,
+        location: clientLocation,
+        description: workDescription
+      };
+
+      fetch('https://script.google.com/macros/s/AKfycbw6arHQViP1VX_TV7b_kV1DXBjaP3KMpDcurdIKzSE/exec', {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => {
+        alert("Data submitted successfully!");
+      })
+      .catch(error => {
+        console.error("Error:", error);
+      });
+
+      // Optionally, clear the form after submission
+      document.getElementById("client-location").value = '';
+      document.getElementById("work-description").value = '';
+    });
+  </script>
+  
+  <script src="script.js"></script>
+</body>
+</html>
